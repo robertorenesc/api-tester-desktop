@@ -1,9 +1,18 @@
 import React from 'react';
 
-const HeadersEditor = ({ headers, onChange, keyPlaceholder, valuePlaceholder }) => {
+const HeadersEditor = ({ headers, onChange, keyPlaceholder, valuePlaceholder, showParamType = false }) => {
   const handleHeaderChange = (index, field, value) => {
     const updatedHeaders = [...headers];
     updatedHeaders[index] = { ...updatedHeaders[index], [field]: value };
+    onChange(updatedHeaders);
+  };
+  
+  const handleParamTypeChange = (index, value) => {
+    const updatedHeaders = [...headers];
+    updatedHeaders[index] = { 
+      ...updatedHeaders[index], 
+      paramType: value 
+    };
     onChange(updatedHeaders);
   };
   
@@ -17,7 +26,7 @@ const HeadersEditor = ({ headers, onChange, keyPlaceholder, valuePlaceholder }) 
   };
   
   const addHeader = () => {
-    onChange([...headers, { key: '', value: '', enabled: true }]);
+    onChange([...headers, { key: '', value: '', enabled: true, paramType: 'query' }]);
   };
   
   const removeHeader = (index) => {
@@ -32,6 +41,7 @@ const HeadersEditor = ({ headers, onChange, keyPlaceholder, valuePlaceholder }) 
         <thead>
           <tr>
             <th></th>
+            {showParamType && <th>Type</th>}
             <th>Name</th>
             <th>Value</th>
             <th></th>
@@ -47,6 +57,17 @@ const HeadersEditor = ({ headers, onChange, keyPlaceholder, valuePlaceholder }) 
                   onChange={() => handleToggleHeader(index)}
                 />
               </td>
+              {showParamType && (
+                <td>
+                  <select
+                    value={header.paramType || 'query'}
+                    onChange={(e) => handleParamTypeChange(index, e.target.value)}
+                  >
+                    <option value="query">Query</option>
+                    <option value="path">Path</option>
+                  </select>
+                </td>
+              )}
               <td>
                 <input
                   type="text"

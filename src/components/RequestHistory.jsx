@@ -1,8 +1,25 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { getRequestHistory } from '../utils/stateManager';
 
 const RequestHistory = ({ onSelect }) => {
-  const history = getRequestHistory();
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    const loadHistory = async () => {
+      try {
+        setLoading(true);
+        const requestHistory = await getRequestHistory();
+        setHistory(requestHistory);
+      } catch (error) {
+        console.error('Error loading request history:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadHistory();
+  }, []);
   
   const formatTimestamp = (timestamp) => {
     const date = new Date(timestamp);
@@ -12,7 +29,9 @@ const RequestHistory = ({ onSelect }) => {
   return (
     <div className="history-panel">
       <h3>History</h3>
-      {history.length === 0 ? (
+      {loading ? (
+        <p>Loading...</p>
+      ) : history.length === 0 ? (
         <p>No request history</p>
       ) : (
         <ul className="history-list">

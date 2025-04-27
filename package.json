@@ -9,7 +9,9 @@
     "build:react": "vite build",
     "dev": "concurrently \"npm run dev:react\" \"npm run dev:electron\"",
     "dev:react": "vite",
-    "dev:electron": "wait-on http://localhost:5173 && electron ."
+    "dev:electron": "wait-on http://localhost:5173 && electron .",
+    "clean:full": "rm -Rf node_modules || true; rm -Rf dist || true; rm package-lock.json || true; rm yarn.lock || true",
+    "clean:dist": "rm -Rf dist || true"
   },
   "dependencies": {
     "axios": "^1.6.0",

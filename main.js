@@ -1,8 +1,28 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const Store = require('electron-store');
+const os = require('os');
 
-const store = new Store();
+// Configure electron-store to use a specific folder
+const storeConfig = {
+  cwd: path.join(os.homedir(), '.api_tester')
+};
+
+// Create separate stores for different data types
+const envStore = new Store({
+  ...storeConfig,
+  name: 'environments'
+});
+
+const requestsStore = new Store({
+  ...storeConfig,
+  name: 'requests'
+});
+
+const historyStore = new Store({
+  ...storeConfig,
+  name: 'history'
+});
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -60,13 +80,13 @@ app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit();
 });
 
-// Handle IPC messages
+// Handle IPC messages for environments
 ipcMain.handle('get-environments', async () => {
-  return store.get('environments') || [];
+  return envStore.get('items') || [];
 });
 
 ipcMain.handle('save-environment', async (event, environment) => {
-  const environments = store.get('environments') || [];
+  const environments = envStore.get('items') || [];
   const existingIndex = environments.findIndex(env => env.id === environment.id);
   
   if (existingIndex >= 0) {
@@ -75,13 +95,49 @@ ipcMain.handle('save-environment', async (event, environment) => {
     environments.push(environment);
   }
   
-  store.set('environments', environments);
+  envStore.set('items', environments);
   return environments;
 });
 
 ipcMain.handle('delete-environment', async (event, environmentId) => {
-  const environments = store.get('environments') || [];
+  const environments = envStore.get('items') || [];
   const updatedEnvironments = environments.filter(env => env.id !== environmentId);
-  store.set('environments', updatedEnvironments);
+  envStore.set('items', updatedEnvironments);
   return updatedEnvironments;
+});
+
+// Handle IPC messages for saved requests
+ipcMain.handle('get-saved-requests', async () => {
+  return requestsStore.get('items') || {};
+});
+
+ipcMain.handle('save-request', async (event, requestName, requestConfig) => {
+  const savedRequests = requestsStore.get('items') || {};
+  savedRequests[requestName] = requestConfig;
+  requestsStore.set('items', savedRequests);
+  return savedRequests;
+});
+
+ipcMain.handle('delete-saved-request', async (event, requestName) => {
+  const savedRequests = requestsStore.get('items') || {};
+  delete savedRequests[requestName];
+  requestsStore.set('items', savedRequests);
+  return savedRequests;
+});
+
+// Handle IPC messages for request history
+ipcMain.handle('get-request-history', async () => {
+  return historyStore.get('items') || [];
+});
+
+ipcMain.handle('add-to-history', async (event, historyItem) => {
+  const history = historyStore.get('items') || [];
+  
+  // Add to beginning of array and limit size
+  history.unshift(historyItem);
+  
+  // Limit history size to 50 items
+  const limitedHistory = history.slice(0, 50);
+  historyStore.set('items', limitedHistory);
+  return limitedHistory;
 });

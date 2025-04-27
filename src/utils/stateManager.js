@@ -1,44 +1,58 @@
 // This utility helps with managing and persisting state between app sessions
-// We're using electron-store in the main process, but this provides a cleaner API
+// We're using electron-store in the main process to store data in the user's home directory
 
-export const saveRequest = (requestName, requestConfig) => {
-    const savedRequests = getSavedRequests();
-    savedRequests[requestName] = requestConfig;
-    localStorage.setItem('savedRequests', JSON.stringify(savedRequests));
-  };
-  
-  export const getSavedRequests = () => {
-    const savedRequestsJson = localStorage.getItem('savedRequests');
-    return savedRequestsJson ? JSON.parse(savedRequestsJson) : {};
-  };
-  
-  export const deleteSavedRequest = (requestName) => {
-    const savedRequests = getSavedRequests();
-    delete savedRequests[requestName];
-    localStorage.setItem('savedRequests', JSON.stringify(savedRequests));
-  };
-  
-  export const getRequestHistory = () => {
-    const historyJson = localStorage.getItem('requestHistory');
-    return historyJson ? JSON.parse(historyJson) : [];
-  };
-  
-  export const addToHistory = (requestConfig, response) => {
-    const history = getRequestHistory();
-    
-    // Add to beginning of array and limit size
-    history.unshift({
+export const saveRequest = async (requestName, requestConfig) => {
+  if (window.electronAPI) {
+    return await window.electronAPI.saveRequest(requestName, requestConfig);
+  } else {
+    console.error('Electron API not available');
+    return {};
+  }
+};
+
+export const getSavedRequests = async () => {
+  if (window.electronAPI) {
+    return await window.electronAPI.getSavedRequests();
+  } else {
+    console.error('Electron API not available');
+    return {};
+  }
+};
+
+export const deleteSavedRequest = async (requestName) => {
+  if (window.electronAPI) {
+    return await window.electronAPI.deleteSavedRequest(requestName);
+  } else {
+    console.error('Electron API not available');
+    return {};
+  }
+};
+
+export const getRequestHistory = async () => {
+  if (window.electronAPI) {
+    return await window.electronAPI.getRequestHistory();
+  } else {
+    console.error('Electron API not available');
+    return [];
+  }
+};
+
+export const addToHistory = async (requestConfig, response) => {
+  if (window.electronAPI) {
+    const historyItem = {
       timestamp: new Date().toISOString(),
       request: requestConfig,
       response: {
         status: response.status,
         statusText: response.statusText,
-        // We don't store the full response data to avoid localStorage size limits
+        // We don't store the full response data to avoid size limits
         // Just store metadata and success/failure
       }
-    });
+    };
     
-    // Limit history size to 50 items
-    const limitedHistory = history.slice(0, 50);
-    localStorage.setItem('requestHistory', JSON.stringify(limitedHistory));
-  };
+    return await window.electronAPI.addToHistory(historyItem);
+  } else {
+    console.error('Electron API not available');
+    return [];
+  }
+};

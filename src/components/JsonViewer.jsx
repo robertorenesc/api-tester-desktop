@@ -9,9 +9,8 @@ const JsonViewer = ({ data }) => {
     : String(data);
 
   return (
-    <div className="json-viewer">
+    <div className="json-viewer" style={{height: "100%"}}>
       <Editor
-        height="300px"
         language="json"
         theme="vs-light"
         value={formattedJson}

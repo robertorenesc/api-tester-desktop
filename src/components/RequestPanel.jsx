@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import HeadersEditor from './HeadersEditor';
 import JsonEditor from './JsonEditor';
 
-const RequestPanel = ({ config, onConfigChange, onSend, isLoading }) => {
+const RequestPanel = ({ config, onConfigChange, onSend, isLoading, setShowSaveModal }) => {
   const [activeTab, setActiveTab] = useState('params');
   
   const handleMethodChange = (e) => {
@@ -27,22 +27,50 @@ const RequestPanel = ({ config, onConfigChange, onSend, isLoading }) => {
   
   const buildUrl = () => {
     try {
-      const url = new URL(config.url);
+      // First, replace path parameters in the URL
+      let processedUrl = config.url;
+      
+      // Find path parameters
+      const pathParams = config.params.filter(param => 
+        param.enabled && param.key && (param.paramType === 'path')
+      );
+      
+      // Replace path parameters in the URL
+      pathParams.forEach(param => {
+        const placeholder = `{${param.key}}`;
+        processedUrl = processedUrl.replace(placeholder, param.value || '');
+      });
+      
+      // Now handle query parameters
+      const url = new URL(processedUrl);
       
       // Clear existing query parameters
       url.search = '';
       
       // Add enabled query parameters
       config.params.forEach(param => {
-        if (param.enabled && param.key) {
+        if (param.enabled && param.key && (!param.paramType || param.paramType === 'query')) {
           url.searchParams.append(param.key, param.value || '');
         }
       });
       
       return url.toString();
     } catch (e) {
-      // If URL is invalid, just return the raw URL
-      return config.url;
+      // If URL is invalid, just return the raw URL with path parameters replaced
+      let processedUrl = config.url;
+      
+      // Find path parameters
+      const pathParams = config.params.filter(param => 
+        param.enabled && param.key && (param.paramType === 'path')
+      );
+      
+      // Replace path parameters in the URL
+      pathParams.forEach(param => {
+        const placeholder = `{${param.key}}`;
+        processedUrl = processedUrl.replace(placeholder, param.value || '');
+      });
+      
+      return processedUrl;
     }
   };
 
@@ -50,6 +78,9 @@ const RequestPanel = ({ config, onConfigChange, onSend, isLoading }) => {
     <div className="panel request-panel">
       <div className="panel-header">
         <h2>Request</h2>
+        <button onClick={() => setShowSaveModal(true)}>
+            Save Request
+        </button>
       </div>
       
       <div className="request-url-container">
@@ -78,14 +109,18 @@ const RequestPanel = ({ config, onConfigChange, onSend, isLoading }) => {
         <div className="full-url">
           Full URL: <code>{buildUrl()}</code>
         </div>
+        <div className="param-help">
+          <small>
+            Path parameters should be included in the URL as <code>{'{paramName}'}</code> and set to "Path" type in the Parameters tab.
+          </small>
+        </div>
       </div>
-      
       <div className="tab-container">
         <div 
           className={`tab ${activeTab === 'params' ? 'active' : ''}`}
           onClick={() => setActiveTab('params')}
         >
-          Params
+          Parameters
         </div>
         <div 
           className={`tab ${activeTab === 'headers' ? 'active' : ''}`}
@@ -108,6 +143,7 @@ const RequestPanel = ({ config, onConfigChange, onSend, isLoading }) => {
             onChange={handleParamsChange}
             keyPlaceholder="Parameter name"
             valuePlaceholder="Value"
+            showParamType={true}
           />
         )}
         

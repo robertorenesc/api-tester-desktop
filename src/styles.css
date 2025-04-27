@@ -1,8 +1,9 @@
 /* src/styles.css */
 :root {
-  --primary-color: #1a73e8;
-  --primary-hover: #1558b9;
-  --secondary-color: #f8f9fa;
+  --primary-color: #233C67;
+  --primary-hover: #1a2f50;
+  --secondary-color: #4470AD;
+  --tertiary-color: #6888BE;
   --border-color: #ddd;
   --text-color: #333;
   --error-color: #d93025;
@@ -21,8 +22,8 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   color: var(--text-color);
-  background-color: #fff;
-  font-size: 14px;
+  background-color: #f5f5f5;
+  font-size: 12px;
 }
 
 .app-container {
@@ -43,7 +44,7 @@ body {
 }
 
 .app-header h1 {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 500;
 }
 
@@ -80,7 +81,7 @@ body {
   border: 1px solid var(--border-color);
   border-radius: 4px;
   overflow: hidden;
-  margin: 8px;
+  margin: 15px;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -99,21 +100,23 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  color: white;
 }
 
 .panel-header h2 {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
+  color: white;
 }
 
 button {
   background-color: var(--primary-color);
   color: white;
   border: none;
-  padding: 8px 16px;
+  padding: 6px 12px;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 12px;
   transition: background-color 0.2s;
 }
 
@@ -126,10 +129,10 @@ button.active {
 }
 
 input, select {
-  padding: 8px;
+  padding: 6px;
   border: 1px solid var(--border-color);
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 12px;
   flex: 1;
 }
 
@@ -155,25 +158,27 @@ input:focus, select:focus {
 }
 
 .tab {
-  padding: 10px 16px;
+  padding: 8px 12px;
   cursor: pointer;
   border-bottom: 2px solid transparent;
   transition: all 0.2s;
+  color: white;
 }
 
 .tab:hover {
-  background-color: var(--grey-light);
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .tab.active {
-  border-bottom-color: var(--primary-color);
-  color: var(--primary-color);
+  border-bottom-color: white;
+  color: white;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .tab-content {
   flex: 1;
   overflow: auto;
-  padding: 8px;
+  padding: 10px;
 }
 
 .input-group {
@@ -185,11 +190,18 @@ input:focus, select:focus {
 
 .input-group label {
   width: 100px;
-  font-size: 14px;
+  font-size: 12px;
 }
 
-.input-group input, .input-group select {
+.input-group input {
+  width: 90%;
   flex: 1;
+}
+
+.input-group select {
+  width: 10%;
+  flex: 1;
+  float: left;
 }
 
 .request-url-container {
@@ -202,13 +214,27 @@ input:focus, select:focus {
 }
 
 .full-url {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--grey-dark);
   margin-top: 4px;
 }
 
 .full-url code {
   font-family: monospace;
+}
+
+.param-help {
+  font-size: 11px;
+  color: var(--grey-dark);
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.param-help code {
+  font-family: monospace;
+  background-color: var(--grey-light);
+  padding: 1px 3px;
+  border-radius: 3px;
 }
 
 .table-container {
@@ -219,25 +245,33 @@ input:focus, select:focus {
 table {
   width: 100%;
   border-collapse: collapse;
+  border: 1px solid lightgray;
 }
 
 th, td {
   text-align: left;
-  padding: 8px;
+  padding: 6px;
   border-bottom: 1px solid var(--border-color);
+  font-size: 11px;
 }
 
 th {
-  background-color: var(--secondary-color);
+  background-color: var(--tertiary-color);
   font-weight: 500;
+  color: white;
 }
 
 .headers-editor, .variables-editor {
   width: 100%;
 }
 
+.headers-editor select {
+  padding: 4px;
+  font-size: 11px;
+  min-width: 80px;
+}
+
 .json-editor {
-  height: 100%;
   border: 1px solid var(--border-color);
   border-radius: 4px;
   overflow: hidden;
@@ -276,7 +310,7 @@ th {
 }
 
 .modal-header {
-  padding: 16px;
+  padding: 12px;
   border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
@@ -284,13 +318,13 @@ th {
 }
 
 .modal-body {
-  padding: 16px;
+  padding: 12px;
   overflow-y: auto;
   flex: 1;
 }
 
 .modal-footer {
-  padding: 16px;
+  padding: 12px;
   border-top: 1px solid var(--border-color);
   display: flex;
   justify-content: flex-end;
@@ -323,6 +357,7 @@ th {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  color: white;
 }
 
 .saved-requests-panel, .history-panel {
@@ -330,9 +365,10 @@ th {
 }
 
 .saved-requests-panel h3, .history-panel h3 {
-  margin-bottom: 12px;
-  font-size: 16px;
+  margin-bottom: 10px;
+  font-size: 14px;
   font-weight: 500;
+  color: white;
 }
 
 .saved-requests-list, .history-list {
@@ -340,16 +376,18 @@ th {
 }
 
 .saved-requests-list li, .history-list li {
-  padding: 8px;
+  padding: 6px;
   border-bottom: 1px solid var(--border-color);
   cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  color: white;
 }
 
 .saved-requests-list li:hover, .history-list li:hover {
-  background-color: var(--grey-light);
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
 }
 
 .history-list li {
@@ -357,14 +395,15 @@ th {
   grid-template-columns: auto 1fr auto auto;
   gap: 4px;
   align-items: center;
-  padding: 8px;
+  padding: 6px;
 }
 
 .history-item-method {
   font-weight: 500;
   padding: 2px 4px;
   border-radius: 2px;
-  background-color: var(--grey-mid);
+  background-color: var(--primary-color);
+  color: white;
 }
 
 .history-item-url {
@@ -372,6 +411,7 @@ th {
   overflow: hidden;
   text-overflow: ellipsis;
   padding: 0 8px;
+  color: white;
 }
 
 .history-item-status {
@@ -379,16 +419,16 @@ th {
 }
 
 .history-item-time {
-  font-size: 12px;
-  color: var(--grey-dark);
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .history-list li.success .history-item-status {
-  color: var(--success-color);
+  color: #5cff9d;
 }
 
 .history-list li.error .history-item-status {
-  color: var(--error-color);
+  color: #ff8f8f;
 }
 
 .disabled {

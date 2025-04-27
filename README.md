@@ -14,6 +14,7 @@ API Tester Desktop is a lightweight, cross-platform desktop application designed
 - **Request History**: Automatically track request history for quick reference
 - **Save Requests**: Save frequently used requests for later use
 - **JSON Support**: Built-in JSON editor and viewer for request and response bodies
+- **Persistent Storage**: All data (environments, saved requests, history) is stored in JSON files in the user's home directory
 
 ## 3. Tools Used
 
@@ -22,7 +23,7 @@ API Tester Desktop is a lightweight, cross-platform desktop application designed
 - **Vite**: Build tool and development server
 - **Axios**: HTTP client for making API requests
 - **Monaco Editor**: Code editor component (via @monaco-editor/react)
-- **Electron Store**: Persistent storage for saving environments and application state
+- **Electron Store**: Persistent storage for saving environments, requests, and history in the user's home directory
 
 ## 4. Commands to Run and Build
 
@@ -52,9 +53,19 @@ npm start
 npm run build
 ```
 
-## 5. Author
+## 5. Data Storage
 
-API Tester Desktop was created by the Roberto Salazar robertorenesc@gmail.com
+API Tester Desktop stores all data in JSON files in a `.api_tester` folder in the user's home directory:
+
+- `environments.json`: Stores all environment configurations and variables
+- `requests.json`: Stores all saved API requests
+- `history.json`: Stores the request history (limited to the last 50 requests)
+
+This approach ensures that your data persists between application restarts and makes it easy to back up or transfer your configurations.
+
+## 6. Author
+
+API Tester Desktop was created by Roberto Salazar (robertorenesc@gmail.com)
 
 ---
 

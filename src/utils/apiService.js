@@ -3,6 +3,20 @@ import axios from 'axios';
 export const makeRequest = async (config) => {
   const { method, url, headers, body, params } = config;
   
+  // Process URL to replace path parameters
+  let processedUrl = url;
+  
+  // Find path parameters
+  const pathParams = params.filter(param => 
+    param.enabled && param.key && (param.paramType === 'path')
+  );
+  
+  // Replace path parameters in the URL
+  pathParams.forEach(param => {
+    const placeholder = `{${param.key}}`;
+    processedUrl = processedUrl.replace(placeholder, param.value || '');
+  });
+  
   // Convert headers array to object
   const headersObj = {};
   headers.forEach(header => {
@@ -14,7 +28,7 @@ export const makeRequest = async (config) => {
   // Configure request
   const requestConfig = {
     method: method.toLowerCase(),
-    url: url,
+    url: processedUrl,
     headers: headersObj,
     timeout: 30000, // 30 seconds timeout
   };
@@ -39,8 +53,17 @@ export const makeRequest = async (config) => {
     }
   }
   
-  // Add query params (we're handling this in the URL construction in RequestPanel,
-  // but we could also handle it here if preferred)
+  // Add query params
+  const queryParams = {};
+  params.forEach(param => {
+    if (param.enabled && param.key && (!param.paramType || param.paramType === 'query')) {
+      queryParams[param.key] = param.value || '';
+    }
+  });
+  
+  if (Object.keys(queryParams).length > 0) {
+    requestConfig.params = queryParams;
+  }
   
   try {
     const response = await axios(requestConfig);

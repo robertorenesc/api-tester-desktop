@@ -50,7 +50,11 @@ function App() {
       setResponse(result);
       
       // Add to history
-      addToHistory(requestConfig, result);
+      try {
+        await addToHistory(requestConfig, result);
+      } catch (historyError) {
+        console.error('Error adding to history:', historyError);
+      }
     } catch (error) {
       const errorResponse = {
         status: error.response?.status || 500,
@@ -64,7 +68,11 @@ function App() {
       setResponse(errorResponse);
       
       // Add failed request to history too
-      addToHistory(requestConfig, errorResponse);
+      try {
+        await addToHistory(requestConfig, errorResponse);
+      } catch (historyError) {
+        console.error('Error adding to history:', historyError);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -90,7 +98,8 @@ function App() {
     processed.params = processed.params.map(param => ({
       key: replaceVariables(param.key, variables),
       value: replaceVariables(param.value, variables),
-      enabled: param.enabled
+      enabled: param.enabled,
+      paramType: param.paramType || 'query'
     }));
     
     // Process body if it's a string
@@ -145,8 +154,16 @@ function App() {
   return (
     <div className="app-container">
       <header className="app-header">
-        <h1>API Tester</h1>
+        <h1>Personal API Tester</h1>
         <div className="toolbar">
+          <div className="action-buttons">
+            <button onClick={() => toggleSidebar('saved')} className={activeSidebar === 'saved' ? 'active' : ''}>
+              Saved
+            </button>
+            <button onClick={() => toggleSidebar('history')} className={activeSidebar === 'history' ? 'active' : ''}>
+              History
+            </button>
+          </div>
           <div className="environment-selector">
             <select 
               value={activeEnvironment?.id || ''} 
@@ -163,18 +180,6 @@ function App() {
             </select>
             <button onClick={() => setShowEnvironmentManager(true)}>
               Manage Environments
-            </button>
-          </div>
-          
-          <div className="action-buttons">
-            <button onClick={() => setShowSaveModal(true)}>
-              Save Request
-            </button>
-            <button onClick={() => toggleSidebar('saved')} className={activeSidebar === 'saved' ? 'active' : ''}>
-              Saved
-            </button>
-            <button onClick={() => toggleSidebar('history')} className={activeSidebar === 'history' ? 'active' : ''}>
-              History
             </button>
           </div>
         </div>
@@ -209,6 +214,7 @@ function App() {
             onConfigChange={setRequestConfig}
             onSend={handleSendRequest}
             isLoading={isLoading}
+            setShowSaveModal={setShowSaveModal}
           />
           <ResponsePanel response={response} isLoading={isLoading} />
         </div>

@@ -3,15 +3,24 @@ import { saveRequest } from '../utils/stateManager';
 
 const SaveRequestModal = ({ requestConfig, onClose }) => {
   const [requestName, setRequestName] = useState('');
+  const [saving, setSaving] = useState(false);
   
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!requestName.trim()) {
       alert('Please enter a name for this request');
       return;
     }
     
-    saveRequest(requestName, requestConfig);
-    onClose(true);
+    try {
+      setSaving(true);
+      await saveRequest(requestName, requestConfig);
+      onClose(true);
+    } catch (error) {
+      console.error('Error saving request:', error);
+      alert('Failed to save request. Please try again.');
+    } finally {
+      setSaving(false);
+    }
   };
   
   return (
@@ -35,8 +44,10 @@ const SaveRequestModal = ({ requestConfig, onClose }) => {
         </div>
         
         <div className="modal-footer">
-          <button onClick={() => onClose(false)}>Cancel</button>
-          <button onClick={handleSave} className="save-btn">Save</button>
+          <button onClick={() => onClose(false)} disabled={saving}>Cancel</button>
+          <button onClick={handleSave} className="save-btn" disabled={saving}>
+            {saving ? 'Saving...' : 'Save'}
+          </button>
         </div>
       </div>
     </div>
